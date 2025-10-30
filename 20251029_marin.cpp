@@ -83,6 +83,27 @@ bool insertion (Node* radice, int n) {
     return false;
 }
 
+void preOrderPrint (Node* n) {
+    if (n == nullptr) return;
+    cout << n->value << "  ";
+    preOrderPrint (n->left);
+    preOrderPrint (n->right);
+}
+
+void inOrderPrint (Node* n) {
+    if (n == nullptr) return;
+    inOrderPrint (n->left);
+    cout <<n->value << "  ";
+    inOrderPrint (n->right);
+}
+
+void postOrderPrint (Node* n) {
+    if (n == nullptr) return ;
+    postOrderPrint(n->left);
+    postOrderPrint(n->right);
+    cout << n->value << "  ";
+}
+
 int main () {
     Node* root= new Node (17);
     root = insertionRec(root, 23);
@@ -102,5 +123,11 @@ int main () {
     if (search(root, 12)) {
         cout << "node found\n";
     }
+    cout << endl << "PREORDER:  ";
+    preOrderPrint(root);
+    cout << endl << "INORDER:   ";
+    inOrderPrint(root);
+    cout << endl << "POSTORDER: ";
+    postOrderPrint(root);
     return 0;
 }
