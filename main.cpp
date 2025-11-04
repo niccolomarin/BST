@@ -11,6 +11,11 @@ struct Node {
         left = nullptr;
         right = nullptr;
     }
+
+    ~Node() {
+        delete left;
+        delete right;
+    }
 };
 
 Node* insertionRec (Node * r, int n) {
@@ -24,6 +29,20 @@ Node* insertionRec (Node * r, int n) {
         r->right = insertionRec(r->right, n);
     } else if ( n< r->value) {
         r->left = insertionRec(r->left, n);
+    }
+    return r;
+}
+
+Node* searchDadRec (Node* r, int n) {
+    if (r == nullptr) {
+        return nullptr;
+    } if (r->left->value == n || r->right->value == n) {
+        return r;
+    }
+    if (n> r->value) {
+        return searchRec(r->right,n);
+    } else if (n< r->value) {
+        return searchRec(r->left,n);
     }
     return r;
 }
@@ -131,3 +150,58 @@ int main () {
     postOrderPrint(root);
     return 0;
 }
+
+bool removeNode (Node* root, int n) {
+    Node* nToRemove = searchRec(root, n);
+    Node* dadNode = searchDadRec(root, n);
+    if (nToRemove == nullptr) return false;
+    if (nToRemove->left == nullptr && nToRemove->right == nullptr) {
+        return noSonRemover(dadNode, nToRemove);
+    }
+    if ((nToRemove->left ==nullptr && nToRemove->right != nullptr) || ((nToRemove->right ==nullptr && nToRemove->left != nullptr))) {
+        return oneSonRemover(dadNode, nToRemove);
+    }
+
+}
+ bool noSonRemover (Node* dad, Node* nRm) {
+    if (dad->right == nRm) {
+            dad->right = nullptr;
+            delete nRm;
+            return true;
+        } else {
+            dad->left == nullptr;
+            delete nRm;
+            return true;
+        }
+ }
+
+ bool oneSonRemover (Node* dad, Node* son) {
+    if(dad->right == son) {
+        if (son->right == nullptr) {
+            dad->right = son->left;
+            return true;
+        } else {
+            dad->right = son->right;
+            return true;
+        }
+    } else {
+        if (son->right == nullptr) {
+            dad->left = son->left;
+            return true;
+        } else {
+            dad->left = son->right;
+            return true;
+        }
+    }
+ }
+
+bool twoSonRemover (Node* toRemove) {
+    Node* succ = findNext(toRemove->right);
+    swap(toRemove->value, succ->value);
+    delete succ;
+}
+
+ Node * findNext (Node* subNodeRight) {
+    if(subNodeRight->left == nullptr) return subNodeRight;
+    return (subNodeRight->left);
+ }
