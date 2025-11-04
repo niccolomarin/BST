@@ -39,7 +39,7 @@ Node* searchRec (Node* r, int n) {
     } else if (n< r->value) {
         return searchRec(r->left,n);
     }
-    //return r;
+    return r;
 }
 
 bool search (Node*radice, int n) {
@@ -64,14 +64,57 @@ bool insertion (Node* radice, int n) {
         if(cur->value == n) {
             return false;
         }
-        if(n>r-value)
+        if(n> cur->value) {
+            if (cur->right == nullptr) {
+                cur->right = new Node(n);
+                return true;
+            } else {
+                cur=cur->right;
+            }
+        } if (n< cur->value) {
+            if (cur->left == nullptr) {
+                cur->left = new Node (n);
+                return true;
+            } else {
+                cur = cur->left;
+            }
+        }
     }
+    return false;
+}
+
+void preOrderPrint (Node* n) {
+    if (n == nullptr) return;
+    cout << n->value << "  ";
+    preOrderPrint (n->left);
+    preOrderPrint (n->right);
+}
+
+void inOrderPrint (Node* n) {
+    if (n == nullptr) return;
+    inOrderPrint (n->left);
+    cout <<n->value << "  ";
+    inOrderPrint (n->right);
+}
+
+void postOrderPrint (Node* n) {
+    if (n == nullptr) return ;
+    postOrderPrint(n->left);
+    postOrderPrint(n->right);
+    cout << n->value << "  ";
 }
 
 int main () {
     Node* root= new Node (17);
     root = insertionRec(root, 23);
     root = insertionRec(root, 12);
+    if (insertion (root, 21)) cout <<"node insert\n";
+    if (insertion (root, 27)) cout << "node insert\n";
+    if (searchRec(root, 27) == nullptr) {
+        cout << "node not found\n";
+    } else {
+        cout << "node found\n";
+    }
     if (searchRec(root, 8) == nullptr) {
         cout << "node not found\n";
     } else {
@@ -80,5 +123,11 @@ int main () {
     if (search(root, 12)) {
         cout << "node found\n";
     }
+    cout << endl << "PREORDER:  ";
+    preOrderPrint(root);
+    cout << endl << "INORDER:   ";
+    inOrderPrint(root);
+    cout << endl << "POSTORDER: ";
+    postOrderPrint(root);
     return 0;
 }
