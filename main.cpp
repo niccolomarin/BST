@@ -12,10 +12,10 @@ struct Node {
         right = nullptr;
     }
 
-    ~Node() {
+    /*~Node() {
         delete left;
         delete right;
-    }
+    }*/
 };
 
 Node* insertionRec (Node * r, int n) {
@@ -33,19 +33,6 @@ Node* insertionRec (Node * r, int n) {
     return r;
 }
 
-Node* searchDadRec (Node* r, int n) {
-    if (r == nullptr) {
-        return nullptr;
-    } if (r->left->value == n || r->right->value == n) {
-        return r;
-    }
-    if (n> r->value) {
-        return searchRec(r->right,n);
-    } else if (n< r->value) {
-        return searchRec(r->left,n);
-    }
-    return r;
-}
 
 Node* searchRec (Node* r, int n) {
     if (r == nullptr) {
@@ -57,6 +44,21 @@ Node* searchRec (Node* r, int n) {
         return searchRec(r->right,n);
     } else if (n< r->value) {
         return searchRec(r->left,n);
+    }
+    return r;
+}
+
+
+Node* searchDadRec (Node* r, int n) {
+    if (r == nullptr) {
+        return nullptr;
+    } if (r->left->value == n || r->right->value == n) {
+        return r;
+    }
+    if (n> r->value) {
+        return searchDadRec(r->right,n);
+    } else if (n< r->value) {
+        return searchDadRec(r->left,n);
     }
     return r;
 }
@@ -123,13 +125,97 @@ void postOrderPrint (Node* n) {
     cout << n->value << "  ";
 }
 
+bool noSonRemover (Node* dad, Node* nRm) {
+    if (dad->right == nRm) {
+        dad->right = nullptr;
+        delete nRm;
+        return true;
+    } else if (dad->left == nRm) {
+        dad->left = nullptr;
+        delete nRm;
+        return true;
+    }
+    return false;
+}
+
+bool oneSonRemover (Node* dad, Node* son) {
+    if(dad->right == son) {
+        if (son->right == nullptr) {
+            dad->right = son->left;
+            delete son;
+            return true;
+        } else {
+            dad->right = son->right;
+            delete son;
+            return true;
+        }
+    } else {
+        if (son->left == nullptr) {
+            dad->left = son->right;
+            delete son;
+            return true;
+        } else {
+            dad->left = son->left;
+            delete son;
+            return true;
+        }
+    }
+}
+
+
+Node * findNext (Node* subNodeRight) {
+    while (subNodeRight->left != nullptr) {
+        subNodeRight= subNodeRight->left;
+    }
+    return subNodeRight;
+}
+
+Node* findDadOfNext (Node*subNodeRight, Node*succ) {
+    while (subNodeRight->left != succ) {
+        subNodeRight= subNodeRight->left;
+    }
+    return subNodeRight;
+}
+
+
+bool twoSonRemover (Node* toRemove) {
+    Node* succ = findNext(toRemove);
+    Node* dad =findDadOfNext(toRemove, succ);
+    dad->left=succ->right;
+    toRemove->value = succ->value;
+    delete succ;
+    return true;
+}
+
+bool removeNode (Node* root, int n) {
+    Node* nToRemove = searchRec(root, n);
+    if (nToRemove == nullptr) return false;
+    Node* dadNode = searchDadRec(root, n);
+    if (nToRemove->left == nullptr && nToRemove->right == nullptr) {
+        return noSonRemover(dadNode, nToRemove);
+    }
+    if ((nToRemove->left ==nullptr && nToRemove->right != nullptr) || ((nToRemove->right ==nullptr && nToRemove->left != nullptr))) {
+        return oneSonRemover(dadNode, nToRemove);
+    }
+    return twoSonRemover(nToRemove);
+}
+
+
 int main () {
     Node* root= new Node (17);
-    root = insertionRec(root, 23);
+    root = insertionRec(root, 24);
     root = insertionRec(root, 12);
-    if (insertion (root, 21)) cout <<"node insert\n";
-    if (insertion (root, 27)) cout << "node insert\n";
-    if (searchRec(root, 27) == nullptr) {
+    insertion (root, 21);
+    insertion (root, 30);
+    root = insertionRec(root,11);
+    root = insertionRec(root,6);
+    root = insertionRec(root,4);
+    root = insertionRec(root,7);
+    root = insertionRec(root,19);
+    root = insertionRec(root,22);
+    root = insertionRec(root,26);
+    root = insertionRec(root,50);
+    /*if (searchRec(root, 27) == nullptr) {
         cout << "node not found\n";
     } else {
         cout << "node found\n";
@@ -147,61 +233,8 @@ int main () {
     cout << endl << "INORDER:   ";
     inOrderPrint(root);
     cout << endl << "POSTORDER: ";
-    postOrderPrint(root);
+    postOrderPrint(root);*/
+    if (!removeNode(root, 24)) cout << "node NOT found!!\n";
+    inOrderPrint(root);
     return 0;
 }
-
-bool removeNode (Node* root, int n) {
-    Node* nToRemove = searchRec(root, n);
-    Node* dadNode = searchDadRec(root, n);
-    if (nToRemove == nullptr) return false;
-    if (nToRemove->left == nullptr && nToRemove->right == nullptr) {
-        return noSonRemover(dadNode, nToRemove);
-    }
-    if ((nToRemove->left ==nullptr && nToRemove->right != nullptr) || ((nToRemove->right ==nullptr && nToRemove->left != nullptr))) {
-        return oneSonRemover(dadNode, nToRemove);
-    }
-
-}
- bool noSonRemover (Node* dad, Node* nRm) {
-    if (dad->right == nRm) {
-            dad->right = nullptr;
-            delete nRm;
-            return true;
-        } else {
-            dad->left == nullptr;
-            delete nRm;
-            return true;
-        }
- }
-
- bool oneSonRemover (Node* dad, Node* son) {
-    if(dad->right == son) {
-        if (son->right == nullptr) {
-            dad->right = son->left;
-            return true;
-        } else {
-            dad->right = son->right;
-            return true;
-        }
-    } else {
-        if (son->right == nullptr) {
-            dad->left = son->left;
-            return true;
-        } else {
-            dad->left = son->right;
-            return true;
-        }
-    }
- }
-
-bool twoSonRemover (Node* toRemove) {
-    Node* succ = findNext(toRemove->right);
-    swap(toRemove->value, succ->value);
-    delete succ;
-}
-
- Node * findNext (Node* subNodeRight) {
-    if(subNodeRight->left == nullptr) return subNodeRight;
-    return (subNodeRight->left);
- }
