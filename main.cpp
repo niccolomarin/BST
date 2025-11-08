@@ -254,7 +254,7 @@ int main () {
     inOrderPrint(root);
     cout << endl << "POSTORDER: ";
     postOrderPrint(root);*/
-    root = removeNode(root, 24);
+    root = removeNode(root, 17);
     inOrderPrint(root);
     return 0;
 }
